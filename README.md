@@ -210,4 +210,4 @@ Contains the visual styling for the login page and student portal.
 Clone the repository:
 
 ```bash
-git clone https://github.com/RathiVarshiniR/Student-Search-and-Filtering-Portal.git
+git clone https://github.com/Kavin-DR/Student-Search-and-Filtering-Portal.git
