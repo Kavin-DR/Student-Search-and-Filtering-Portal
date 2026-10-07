@@ -1,106 +1,169 @@
-# Registrar — Student Search & Filtering Portal
+Registrar — Student Search & Filtering Portal
+==============================================
 
-A full-stack web app for searching, filtering, sorting, and managing student
-records, with sign-in and role-based access control.
+A full-stack web application for searching, filtering, sorting, and managing
+college student records, with authentication and role-based access control.
 
-## Tech Stack
-- **Backend:** Node.js + Express
-- **Database:** SQLite via Node's **built-in `node:sqlite` module** (no external DB driver, no native compilation required) — file-based, zero-config, auto-seeds 120 sample students on first run
-- **Auth:** JWT (`jsonwebtoken`) + password hashing (`bcryptjs`) — both pure JS, no native compilation
-- **Frontend:** Vanilla HTML/CSS/JavaScript (no framework/build step required)
+Live Application
+----------------
 
-> **Requires Node.js 22.5+** (for the built-in `node:sqlite` module). Node 24+ recommended.
+https://student-portal-api-t3qy.onrender.com
 
-## What's new in this version
-- Redesigned UI: navy/brass "registrar office" visual identity, serif+sans
-  type pairing (Source Serif 4 / IBM Plex Sans), a ledger-style table instead
-  of a generic card grid.
-- Real access control: every `/api/students*` route requires a signed-in
-  session. Write actions (create/edit/delete) are restricted to the **admin**
-  role; the **viewer** role gets read-only search and filtering.
+The application is deployed on Render and serves both the frontend and backend
+from the same web service.
 
-## Default accounts (seeded automatically)
+Project Overview
+----------------
 
-| Username | Password    | Role   | Can do                        |
-|----------|-------------|--------|--------------------------------|
-| `admin`  | `Admin@123` | admin  | Search, filter, add, edit, delete |
-| `viewer` | `Viewer@123`| viewer | Search and filter only         |
+The Registrar — Student Search & Filtering Portal is a college-level
+student record management system designed to provide a secure and organized
+way to search, filter, view, and manage student information.
 
-**Change these before deploying anywhere beyond your own machine.** They're
-meant to get you started locally, not for production use. See "Security
-notes" below.
+The application includes:
 
-## Project Structure
-```
+- Secure login
+- Role-based access control
+- Student search
+- Multiple filtering options
+- Sorting
+- Pagination
+- Student record creation
+- Student record editing
+- Student record deletion
+- SQLite database storage
+- JWT-based authentication
+- Password hashing
+- Cloud deployment using Render
+
+Tech Stack
+----------
+
+- Backend: Node.js + Express
+- Database: SQLite using Node.js built-in `node:sqlite` module
+- Authentication: JWT using `jsonwebtoken`
+- Password Hashing: `bcryptjs`
+- Frontend: Vanilla HTML, CSS, and JavaScript
+- Version Control: Git + GitHub
+- Deployment: Render
+
+Node.js Requirement
+-------------------
+
+The project requires Node.js 22.5 or later because it uses the built-in
+`node:sqlite` module.
+
+Node.js 24+ is recommended.
+
+Features
+--------
+
+Authentication
+~~~~~~~~~~~~~~
+
+- Login page for registered users
+- Username and password authentication
+- Password hashing using bcrypt
+- JWT-based authentication
+- Protected student-management API routes
+- Session verification
+- Automatic redirection when authentication is missing or invalid
+- Password visibility toggle on the login page
+
+User Access
+~~~~~~~~~~~
+
+The portal can only be accessed using the two registered username/password
+combinations configured in the application.
+
+There are two user roles:
+
+- Admin
+  - Search students
+  - Filter students
+  - Sort students
+  - View student records
+  - Add student records
+  - Edit student records
+  - Delete student records
+
+- Student
+  - Search students
+  - Filter students
+  - Sort students
+  - View student records
+  - No create, edit, or delete permissions
+
+No other username/password combination can successfully open the portal.
+
+The Student Email ID stored in a student record is student information only.
+It is not used as a login credential.
+
+The actual usernames and passwords are intentionally not included in this
+README.
+
+Student Search and Filtering
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The portal supports:
+
+- Student name search
+- Register number search
+- Department filtering
+- Degree/course filtering
+- Year of study filtering
+- Semester filtering
+- Section filtering
+- Gender filtering
+- Residential status filtering
+- Admission category filtering
+- Student status filtering
+- Sorting
+- Pagination
+
+Student Information
+-------------------
+
+Each student record contains the following 20 fields:
+
+1. Register Number
+2. First Name
+3. Last Name
+4. Gender
+5. Date of Birth
+6. Degree / Course
+7. Department / Major
+8. Year of Study
+9. Semester
+10. Section
+11. Attendance Percentage
+12. Residential Status
+13. Student Email ID
+14. Student Phone Number
+15. Parent / Guardian Name
+16. Parent Contact Number
+17. Permanent Address
+18. Blood Group
+19. Admission Category / Quota
+20. Status
+
+Project Structure
+-----------------
+
+```text
 student-portal/
+│
 ├── backend/
-│   ├── server.js      # Express app, API routes, auth wiring
-│   ├── auth.js         # JWT signing/verification, role middleware
-│   ├── db.js            # SQLite connection, auto-seed (students + users)
+│   ├── server.js
+│   ├── auth.js
+│   ├── db.js
 │   ├── package.json
-│   └── students.db     # created automatically on first run
+│   └── students.db
+│
 ├── frontend/
-│   ├── login.html / login.js   # sign-in screen
-│   ├── index.html               # main portal shell
-│   ├── script.js                 # search/filter/sort + admin CRUD UI
+│   ├── login.html
+│   ├── login.js
+│   ├── index.html
+│   ├── script.js
 │   └── style.css
+│
 └── README.md
-```
-
-## Setup & Run
-
-```bash
-cd backend
-npm install
-npm start
-```
-
-The server starts on **http://localhost:4000**. Visit that URL, sign in with
-one of the accounts above, and you'll land on the student register.
-
-Optional: set a stable JWT secret so sessions survive server restarts consistently:
-
-```bash
-# macOS/Linux
-JWT_SECRET=some-long-random-string npm start
-
-# Windows PowerShell
-$env:JWT_SECRET="some-long-random-string"; npm start
-```
-
-If `JWT_SECRET` isn't set, the server generates a random one at startup —
-this works fine for local use, but existing sessions won't survive a restart.
-
-## API Endpoints
-
-| Method | Endpoint                  | Auth required | Description                              |
-|--------|-----------------------------|----------------|--------------------------------------------|
-| POST   | `/api/auth/login`           | No             | Exchange username/password for a JWT      |
-| GET    | `/api/auth/me`               | Yes            | Verify current token, return user info    |
-| GET    | `/api/students`             | Yes            | List/search/filter/sort/paginate students |
-| GET    | `/api/students/filters`     | Yes            | Distinct values for filter dropdowns      |
-| GET    | `/api/students/:id`         | Yes            | Get one student                           |
-| POST   | `/api/students`             | Yes (admin)    | Create a student                          |
-| PUT    | `/api/students/:id`         | Yes (admin)    | Update a student                          |
-| DELETE | `/api/students/:id`         | Yes (admin)    | Delete a student                          |
-
-### Query params for `GET /api/students`
-`q`, `class`, `section`, `grade`, `gender`, `status`, `sortBy`, `sortDir`, `page`, `pageSize`
-
-## Security notes
-
-This is a solid starting point, not a hardened production system. Before
-using it beyond your own machine, you'd want to:
-- Change the default account passwords (or remove those seed accounts and
-  add your own via direct DB inserts / a signup flow).
-- Set `JWT_SECRET` to a real secret, kept out of source control.
-- Serve over HTTPS — tokens are sent as plain Bearer headers.
-- Add rate limiting on `/api/auth/login` to slow down password guessing.
-- Consider shorter token expiry plus a refresh-token flow for longer sessions.
-- Session tokens are kept in `sessionStorage` (cleared when the tab closes) rather than `localStorage`, which limits — but doesn't eliminate — exposure if the page is vulnerable to XSS.
-
-## Notes
-- To reset all data (students and user accounts), delete `backend/students.db`
-  (and any `-shm`/`-wal` files) and restart the server.
-- Swap `node:sqlite` for `pg` or `mysql2` in `db.js` if you need a networked
-  DB instead of SQLite.
